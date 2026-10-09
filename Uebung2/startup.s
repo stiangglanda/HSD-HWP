@@ -18,8 +18,16 @@ __Vectors
 		
 	AREA Startup_Ram, DATA, READWRITE, NOINIT
 	EXPORT __initial_sp
-		
+	EXPORT Startup_StackGuardTop
+	EXPORT Startup_StackGuardBottom
+	
+Startup_StackGuardTop
+	SPACE 4
+	
 	SPACE StackSize
 __initial_sp
+
+	SPACE 4
+Startup_StackGuardBottom
 	
     END
