@@ -5,7 +5,8 @@ StackSize EQU 64
     IMPORT __main
 
 Reset_Handler
-	B
+    LDR R0, = __main
+    BX R0
     
 
     AREA Startup_Rom, DATA, READONLY
@@ -16,6 +17,7 @@ __Vectors
     DCD Reset_Handler
 		
 	AREA Startup_Ram, DATA, READWRITE, NOINIT
+	EXPORT __initial_sp
 		
 	SPACE StackSize
 __initial_sp
