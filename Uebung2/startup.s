@@ -1,4 +1,4 @@
-StackSize EQU 64
+StackSize EQU 1024
 	
     AREA Startup_Code, CODE, READONLY
     EXPORT Reset_Handler
