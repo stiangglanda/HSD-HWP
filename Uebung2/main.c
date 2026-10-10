@@ -7,6 +7,13 @@ extern uint32_t Startup_StackGuardBottom;
 static int32_t Main_StackStatus;
 static uint32_t Main_Result;
 
+// Variant 1:
+// static uint8_t MyVariable[1024] = { 0 };
+// Variant 2:
+// static uint8_t MyVariable[1024] = { 1 };
+// Variant 3:
+//static uint8_t const MyVariable[1024] = { 1 };
+
 uint32_t const * Startup_GetStackPointer(void);
 
 // Determines the status of the stack.
@@ -49,6 +56,8 @@ static uint32_t Main_TriangularNumber(uint32_t n) {
 int main(void) {
     Startup_StackGuardBottom = STACK_GUARD;
     Startup_StackGuardTop = STACK_GUARD;
+
+    //volatile uint8_t x = MyVariable[0] + MyVariable[1];
 	
 		for (uint32_t n = 0; n <= 9; n++) {
       Main_Result = Main_TriangularNumber(n);
