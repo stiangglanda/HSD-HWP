@@ -1,0 +1,19 @@
+./objects/stm32f0xx_hal_rcc.o: \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Src\stm32f0xx_hal_rcc.c \
+  RTE\_Target_1\Pre_Include_Global.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc\stm32f0xx_hal.h \
+  RTE\Device\STM32F072VBTx\stm32f0xx_hal_conf.h \
+  RTE\_Target_1\RTE_Components.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc\stm32f0xx_hal_rcc.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc\stm32f0xx_hal_def.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\CMSIS\Device\ST\STM32F0xx\Include\stm32f0xx.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\CMSIS\Device\ST\STM32F0xx\Include\stm32f072xb.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\ARM\CMSIS\6.3.0\CMSIS\Core\Include\core_cm0.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\CMSIS\Device\ST\STM32F0xx\Include\system_stm32f0xx.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc\stm32f0xx_hal_rcc_ex.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc\stm32f0xx_hal_gpio.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc\stm32f0xx_hal_gpio_ex.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc\stm32f0xx_hal_cortex.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc\stm32f0xx_hal_flash.h \
+  C:\users\stiangglanda\AppData\Local\Arm\Packs\Keil\STM32F0xx_DFP\2.1.1\Drivers\STM32F0xx_HAL_Driver\Inc\stm32f0xx_hal_flash_ex.h

@@ -1,0 +1,117 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.43.1.0
+Copyright (C) 2025 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Leander Kieweg, FH OÖ, LIC=----
+ 
+Tool Versions:
+Toolchain:       MDK-Lite  Version: 5.43.0.0
+Toolchain Path:  C:\users\stiangglanda\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin
+C Compiler:      ArmClang.exe V6.24
+Assembler:       Armasm.exe V6.24
+Linker/Locator:  ArmLink.exe V6.24
+Library Manager: ArmAr.exe V6.24
+Hex Converter:   FromElf.exe V6.24
+CPU DLL:         SARMCM3.DLL V5.43.0.0
+Dialog DLL:      DARMCM1.DLL V1.19.6.0
+Target DLL:      UL2CM3.DLL V1.164.16.0
+Dialog DLL:      TARMCM1.DLL V1.14.6.0
+ 
+<h2>Project:</h2>
+Z:\home\stiangglanda\dev\HSD-HWP\Uebung3\uebung3.uvprojx
+Project File Date:  10/16/2026
+
+<h2>Output:</h2>
+*** Using Compiler 'V6.24', folder: 'C:\users\stiangglanda\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin'
+Rebuild target 'Target_1'
+compiling main.c...
+compiling stm32f0xx_hal.c...
+compiling stm32f0xx_hal_flash.c...
+compiling stm32f0xx_hal_flash_ex.c...
+C:/users/stiangglanda/AppData/Local/Arm/Packs/Keil/STM32F0xx_DFP/2.1.1/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c(136): warning: unused parameter 'SubPriority' [-Wunused-parameter]
+  136 | void HAL_NVIC_SetPriority(IRQn_Type IRQn, uint32_t PreemptPriority, uint32_t SubPriority)
+      |                                                                              ^
+1 warning generated.
+compiling stm32f0xx_hal_cortex.c...
+compiling stm32f0xx_hal_gpio.c...
+compiling stm32f0xx_hal_rcc_ex.c...
+C:/users/stiangglanda/AppData/Local/Arm/Packs/Keil/STM32F0xx_DFP/2.1.1/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c(1018): warning: unused parameter 'RCC_MCOx' [-Wunused-parameter]
+ 1018 | void HAL_RCC_MCOConfig(uint32_t RCC_MCOx, uint32_t RCC_MCOSource, uint32_t RCC_MCODiv)
+      |                                 ^
+1 warning generated.
+compiling stm32f0xx_hal_rcc.c...
+compiling system_stm32f0xx.c...
+assembling startup_stm32f072xb.s...
+linking...
+Program Size: Code=340 RO-data=208 RW-data=0 ZI-data=1632  
+".\Objects\uebung3.axf" - 0 Error(s), 2 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                https://www.keil.com/pack/ARM.CMSIS.6.3.0.pack
+                ARM::CMSIS@6.3.0
+                CMSIS (Common Microcontroller Software Interface Standard)
+   * Component: CORE Version: 6.2.0
+
+Package Vendor: Keil
+                https://www.keil.com/pack/Keil.STM32F0xx_DFP.2.1.1.pack
+                Keil::STM32F0xx_DFP@2.1.1
+                STMicroelectronics STM32F0 Series Device Support, Drivers and Examples
+   * Component: COMMON Version: 1.11.3
+   * Component: CORTEX Version: 1.11.3
+   * Component: FLASH Version: 1.11.3
+   * Component: GPIO Version: 1.11.3
+   * Component: RCC Version: 1.11.3
+   * Component: Startup Version: 1.0.0
+
+<h2>Collection of Component include folders:</h2>
+  ./RTE/Device/STM32F072VBTx
+  ./RTE/_Target_1
+  C:/users/stiangglanda/AppData/Local/Arm/Packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include
+  C:/users/stiangglanda/AppData/Local/Arm/Packs/Keil/STM32F0xx_DFP/2.1.1/Drivers/CMSIS/Device/ST/STM32F0xx/Include
+  C:/users/stiangglanda/AppData/Local/Arm/Packs/Keil/STM32F0xx_DFP/2.1.1/Drivers/STM32F0xx_HAL_Driver/Inc
+  C:/users/stiangglanda/AppData/Local/Arm/Packs/Keil/STM32F0xx_DFP/2.1.1/Drivers/STM32F0xx_HAL_Driver/Inc/Legacy
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE@6.2.0
+
+   * Component: Keil::Device&Standalone:STM32Cube HAL:COMMON@1.11.3
+      Include file:  Drivers/STM32F0xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
+      Include file:  Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h
+      Include file:  Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h
+      Source file:   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c
+      Include file:  MDK/Templates/Inc/stm32f0xx_hal_conf.h
+      Source file:   MDK/Templates/Src/stm32f0xx_hal_msp.c
+      Include file:  MDK/Templates/Inc/stm32f0xx_it.h
+      Source file:   MDK/Templates/Src/stm32f0xx_it.c
+      Include file:  MDK/Templates/Inc/main.h
+      Source file:   MDK/Templates/Src/main.c
+
+   * Component: Keil::Device&Standalone:STM32Cube HAL:CORTEX@1.11.3
+      Source file:   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c
+
+   * Component: Keil::Device&Standalone:STM32Cube HAL:FLASH@1.11.3
+      Source file:   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash.c
+      Source file:   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash_ex.c
+
+   * Component: Keil::Device&Standalone:STM32Cube HAL:GPIO@1.11.3
+      Source file:   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c
+
+   * Component: Keil::Device&Standalone:STM32Cube HAL:RCC@1.11.3
+      Source file:   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c
+      Source file:   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc_ex.c
+
+   * Component: Keil::Device&Standalone:Startup@1.0.0
+      Source file:   MDK/Device/Source/ARM/STM32F0xx_OPT.s
+      Include file:  Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f0xx.h
+      Source file:   Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/arm/startup_stm32f072xb.s
+      Source file:   Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/system_stm32f0xx.c
+Build Time Elapsed:  00:00:02
+</pre>
+</body>
+</html>
