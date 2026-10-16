@@ -1,1 +1,2 @@
-./objects/main.o: main.c RTE\_Target_1\Pre_Include_Global.h
+./objects/main.o: main.c RTE\_Target_1\Pre_Include_Global.h \
+  Modules\Timer.h

@@ -1,5 +1,7 @@
 --cpu Cortex-M0
 ".\objects\main.o"
+".\objects\gpio.o"
+".\objects\timer.o"
 ".\objects\stm32f0xx_hal.o"
 ".\objects\stm32f0xx_hal_cortex.o"
 ".\objects\stm32f0xx_hal_flash.o"
