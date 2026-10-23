@@ -1,6 +1,7 @@
 #include <stm32f072xb.h>
 #include "Timer.h"
 #include "Gpio.h"
+#include "StateMachine.h"
 
 static void MyCallback(int id) {
 	static bool ledState = true;
@@ -17,7 +18,8 @@ int main() {
 	Timer_Initialize(TIMER_ID_TIM6);
 	Timer_Enable(TIMER_ID_TIM6, myCallbackVar, 1000/6/2, TIME_UNIT_MS, true);
 	
-	while (true) {
+	State_t const* state = &State_A
+	state->Enter();
 	
-	}
+	StateMachine_Run(state);
 }
