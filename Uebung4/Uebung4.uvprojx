@@ -404,6 +404,31 @@
               <FileType>1</FileType>
               <FilePath>.\modules\Timer.c</FilePath>
             </File>
+            <File>
+              <FileName>State_A.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\State_A.c</FilePath>
+            </File>
+            <File>
+              <FileName>StateMachine.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\StateMachine.h</FilePath>
+            </File>
+            <File>
+              <FileName>State_B.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\State_B.c</FilePath>
+            </File>
+            <File>
+              <FileName>State_C.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\State_C.c</FilePath>
+            </File>
+            <File>
+              <FileName>StateMachine.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\StateMachine.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
