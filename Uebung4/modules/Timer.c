@@ -26,7 +26,7 @@ typedef struct Timer_Context_s {
   uint32_t                  TickCount;
 } Timer_Context_t;
 
-#define TIMER_COUNT 9
+#define TIMER_COUNT 8
 
 static Timer_Context_t Timer_Context[TIMER_COUNT] = {
   
@@ -196,16 +196,54 @@ int Timer_GetTickCount(int id, uint32_t * tickCount)
   return 0;
 }
 
-void TIM6_DAC_IRQHandler(void) {
-  Timer_Context_t * context = Timer_GetContext(TIMER_ID_TIM6);
+static void Timer_ISR(int id) {
+  Timer_Context_t * context = Timer_GetContext(id);
   if(context == NULL)
   {
     return;
   }
 
-	context->Timer->SR &= 0xFFFE; // Clear UIF flag
+  if((context->Timer->SR & TIM_SR_UIF) == 0)
+  {
+    return;
+  }
+
+	context->Timer->SR &= ~TIM_SR_UIF; // Clear UIF flag
+  context->TickCount++;
   if(context->Callback != NULL)
   {
-    context->Callback(TIMER_ID_TIM6);
+    context->Callback(id);
   }
+}
+
+void TIM2_Handler(void) {
+  Timer_ISR(TIMER_ID_TIM2);
+}
+
+void TIM3_Handler(void) {
+  Timer_ISR(TIMER_ID_TIM3);
+}
+
+void TIM6_DAC_Handler(void) {
+  Timer_ISR(TIMER_ID_TIM6);
+}
+
+void TIM7_Handler(void) {
+  Timer_ISR(TIMER_ID_TIM7);
+}
+
+void TIM14_Handler(void) {
+  Timer_ISR(TIMER_ID_TIM14);
+}
+
+void TIM15_Handler(void) {
+  Timer_ISR(TIMER_ID_TIM15);
+}
+
+void TIM16_Handler(void) {
+  Timer_ISR(TIMER_ID_TIM16);
+}
+
+void TIM17_Handler(void) {
+  Timer_ISR(TIMER_ID_TIM17);
 }

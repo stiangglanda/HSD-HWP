@@ -20,7 +20,12 @@ void State_B_Enter(void);
 State_t const* State_B_Process(void);
 void State_B_Exit(void);
 
+void State_C_Enter(void);
+State_t const* State_C_Process(void);
+void State_C_Exit(void);
+
 extern State_t const State_A;
 extern State_t const State_B;
+extern State_t const State_C;
 
 #endif

@@ -29,7 +29,13 @@ int Timer_Enable(int id, Timer_Callback_t callback, int interval, Time_Unit_t un
 int Timer_Disable(int id);
 int Timer_GetTickCount(int id, uint32_t * tickCount);
 
-void TIM6_DAC_IRQHandler(void);
-
+void TIM2_Handler(void); 
+void TIM3_Handler(void); 
+void TIM6_DAC_Handler(void); 
+void TIM7_Handler(void); 
+void TIM14_Handler(void); 
+void TIM15_Handler(void); 
+void TIM16_Handler(void); 
+void TIM17_Handler(void);
 
 #endif // TIMER_H
