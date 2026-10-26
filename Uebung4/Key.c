@@ -3,68 +3,56 @@
 #include "Timer.h"
 #include "EventQueue.h"
 
-static uint32_t buttonWakeUpPressCount = 0;
-static uint32_t buttonUser0PressCount = 0;
-static uint32_t buttonUser1PressCount = 0;
+#define KEY_CHECK_INTERVAL_MS 50
+#define KEY_MIN_PRESS_MS      100
+#define KEY_MAX_PRESS_MS      1000
+
+static uint32_t wakeUpCount = 0;
+static uint32_t user0Count = 0;
+static uint32_t user1Count = 0;
+
+// Returns true if a valid key press just ended.
+static bool UpdateKey(int gpioId, uint32_t * counter) {
+    bool pressed = false;
+    Gpio_Get(gpioId, &pressed);
+
+    if (pressed) {
+        (*counter)++;
+        return false;
+    }
+
+    uint32_t time = *counter * KEY_CHECK_INTERVAL_MS;
+    *counter = 0;
+    return (time >= KEY_MIN_PRESS_MS && time < KEY_MAX_PRESS_MS);
+}
+
+static void SendKeyEvent(int32_t key) {
+    Event_t event = { 1, key, 0, 0 };
+    EventQueue_Put(&event);
+}
 
 static void CheckCallback(int id) {
-    bool buttonState;
-	Gpio_Get(GPIO_ID_BUTTON_WAKE_UP, &buttonState);
-    if(buttonState) {
-        buttonWakeUpPressCount++;
-    } else {
-        if(buttonWakeUpPressCount >= 2 && buttonWakeUpPressCount <= 19) {
-            Event_t event;
-            event.EventType = 1; // Button pressed event type
-            event.X = 0; // Additional information (meaning depends on event type)
-            event.Y = 0; // Additional information (meaning depends on event type)
-            event.Z = 0; // Additional information (meaning depends on event type)
-            EventQueue_Put(&event);
-        }
-        buttonWakeUpPressCount = 0;
+    (void)id;
+
+    UpdateKey(GPIO_ID_BUTTON_WAKE_UP, &wakeUpCount); // no event for Wake-Up
+
+    if (UpdateKey(GPIO_ID_BUTTON_USER0, &user0Count)) {
+        SendKeyEvent(0);
     }
-    Gpio_Get(GPIO_ID_BUTTON_USER0, &buttonState);
-    if(buttonState) {
-        buttonUser0PressCount++;
-    } else {
-        if(buttonUser0PressCount >= 2 && buttonUser0PressCount <= 19) {
-            Event_t event;
-            event.EventType = 1; // Button pressed event type
-            event.X = 0; // Additional information (meaning depends on event type)
-            event.Y = 0; // Additional information (meaning depends on event type)
-            event.Z = 0; // Additional information (meaning depends on event type)
-            EventQueue_Put(&event);
-        }
-        buttonUser0PressCount = 0;
-    }
-    Gpio_Get(GPIO_ID_BUTTON_USER1, &buttonState);
-    if(buttonState) {
-        buttonUser1PressCount++;
-    } else {
-        if(buttonUser1PressCount >= 2 && buttonUser1PressCount <= 19) {
-            Event_t event;
-            event.EventType = 1; // Button pressed event type
-            event.X = 1; // Additional information (meaning depends on event type)
-            event.Y = 0; // Additional information (meaning depends on event type)
-            event.Z = 0; // Additional information (meaning depends on event type)
-            EventQueue_Put(&event);
-        }
-        buttonUser1PressCount = 0;
+    if (UpdateKey(GPIO_ID_BUTTON_USER1, &user1Count)) {
+        SendKeyEvent(1);
     }
 }
 
-int Key_Initialize(void){
-    buttonWakeUpPressCount = 0;
-    buttonUser0PressCount = 0;
-    buttonUser1PressCount = 0;
+int Key_Initialize(void) {
+    wakeUpCount = 0;
+    user0Count = 0;
+    user1Count = 0;
 
     Gpio_Initialize(GPIO_ID_BUTTON_WAKE_UP, GPIO_MODE_INPUT, false);
     Gpio_Initialize(GPIO_ID_BUTTON_USER0, GPIO_MODE_INPUT, false);
     Gpio_Initialize(GPIO_ID_BUTTON_USER1, GPIO_MODE_INPUT, false);
 
-	Timer_Callback_t myCallbackVar = *CheckCallback;
-	Timer_Initialize(TIMER_ID_TIM6);
-	Timer_Enable(TIMER_ID_TIM6, myCallbackVar, 50, TIME_UNIT_MS, true);
-
-    return 0;
+    Timer_Initialize(TIMER_ID_TIM6);
+    return Timer_Enable(TIMER_ID_TIM6, CheckCallback, KEY_CHECK_INTERVAL_MS, TIME_UNIT_MS, true);
 }
