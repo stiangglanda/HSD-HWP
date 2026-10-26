@@ -429,6 +429,16 @@
               <FileType>1</FileType>
               <FilePath>.\StateMachine.c</FilePath>
             </File>
+            <File>
+              <FileName>EventQueue.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\EventQueue.h</FilePath>
+            </File>
+            <File>
+              <FileName>EventQueue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\EventQueue.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

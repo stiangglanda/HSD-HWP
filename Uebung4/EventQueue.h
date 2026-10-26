@@ -1,3 +1,10 @@
+#ifndef EVENTQUEUE_H
+#define EVENTQUEUE_H
+
+#define MAX_EVENT_QUEUE_SIZE 16
+
+#include <stdint.h>
+
 /******************************************************************************* 
 Provides information about an event. 
 *******************************************************************************/
@@ -37,3 +44,5 @@ int EventQueue_Get(Event_t * event);
 Clears the event queue. 
 *******************************************************************************/
 void EventQueue_Clear(void);
+
+#endif
