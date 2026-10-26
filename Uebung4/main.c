@@ -3,6 +3,7 @@
 #include "Gpio.h"
 #include "StateMachine.h"
 #include "Key.h"
+#include "EventQueue.h"
 
 //static void MyCallback(int id) {
 //	static bool ledState = true;
@@ -13,6 +14,8 @@
 
 int main() {
 	__enable_irq();
+
+	EventQueue_Initialize();
 
 	Key_Initialize();
 
