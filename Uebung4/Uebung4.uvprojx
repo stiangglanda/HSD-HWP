@@ -420,11 +420,6 @@
               <FilePath>.\State_B.c</FilePath>
             </File>
             <File>
-              <FileName>State_C.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\State_C.c</FilePath>
-            </File>
-            <File>
               <FileName>StateMachine.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\StateMachine.c</FilePath>

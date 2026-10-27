@@ -5,28 +5,14 @@
 #include "Key.h"
 #include "EventQueue.h"
 
-//static void MyCallback(int id) {
-//	static bool ledState = true;
-//	(void)id;
-//	Gpio_Set(GPIO_ID_LED4, ledState);
-//	ledState = !ledState;
-//}
-
 int main() {
 	__enable_irq();
 
-	EventQueue_Initialize();
+	Gpio_Initialize(GPIO_ID_LED3, GPIO_MODE_OUTPUT, false);
+    Gpio_Initialize(GPIO_ID_LED4, GPIO_MODE_OUTPUT, false);
 
-	Key_Initialize();
+    EventQueue_Initialize();
+    Key_Initialize();
 
-	// Timer_Callback_t myCallbackVar = *MyCallback;
-	// Gpio_Initialize(GPIO_ID_LED4, GPIO_MODE_OUTPUT, false);
-
-	// Timer_Initialize(TIMER_ID_TIM6);
-	// Timer_Enable(TIMER_ID_TIM6, myCallbackVar, 1000/6/2, TIME_UNIT_MS, true);
-	
-	State_t const* state = &State_A;
-	state->Enter();
-	
-	StateMachine_Run(state);
+    StateMachine_Run(&State_A);
 }

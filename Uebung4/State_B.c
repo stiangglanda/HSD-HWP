@@ -1,23 +1,16 @@
-#ifndef STATE_B_H
-#define STATE_B_H
-
 #include "StateMachine.h"
+#include "Gpio.h"
+#include "EventQueue.h"
 
-State_t const State_B = {State_B_Enter, State_B_Process, State_B_Exit};
+static void Enter(void) { Gpio_Set(GPIO_ID_LED4, true); }
+static void Exit(void)  { Gpio_Set(GPIO_ID_LED4, false); }
 
-void State_B_Enter(void) {
-	// ToDo: What we need to do in entering
+static State_t const * Process(void) {
+    Event_t event;
+    if (EventQueue_Get(&event) == 0 && event.EventType == 1 && event.X == 0) {
+        return &State_A; // User0 gedrückt
+    }
+    return &State_B;
 }
 
-State_t const* State_B_Process(void) {
-	// ToDO: Check, wheter we want to stay or leave
-	// return &State_A;
-	
-	return &State_B;
-}
-
-void State_B_Exit(void) {
-	// ToDo: What we need to do in leaving
-}
-
-#endif
+State_t const State_B = { Enter, Process, Exit };
