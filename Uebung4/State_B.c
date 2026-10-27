@@ -5,6 +5,7 @@
 static void Enter(void) { 
 	Gpio_Set(GPIO_ID_LED4, false);
 }
+
 static void Exit(void) {
 	Gpio_Set(GPIO_ID_LED4, true);
 }
