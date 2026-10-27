@@ -2,8 +2,12 @@
 #include "Gpio.h"
 #include "EventQueue.h"
 
-static void Enter(void) { Gpio_Set(GPIO_ID_LED4, true); }
-static void Exit(void)  { Gpio_Set(GPIO_ID_LED4, false); }
+static void Enter(void) { 
+	Gpio_Set(GPIO_ID_LED4, false);
+}
+static void Exit(void) {
+	Gpio_Set(GPIO_ID_LED4, true);
+}
 
 static State_t const * Process(void) {
     Event_t event;

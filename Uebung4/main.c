@@ -8,11 +8,11 @@
 int main() {
 	__enable_irq();
 
-	Gpio_Initialize(GPIO_ID_LED3, GPIO_MODE_OUTPUT, false);
-    Gpio_Initialize(GPIO_ID_LED4, GPIO_MODE_OUTPUT, false);
+	Gpio_Initialize(GPIO_ID_LED3, GPIO_MODE_OUTPUT, true);
+	Gpio_Initialize(GPIO_ID_LED4, GPIO_MODE_OUTPUT, true);
 
-    EventQueue_Initialize();
-    Key_Initialize();
+  EventQueue_Initialize();
+  Key_Initialize();
 
-    StateMachine_Run(&State_A);
+  StateMachine_Run(&State_A);
 }

@@ -11,7 +11,7 @@ static uint32_t wakeUpCount = 0;
 static uint32_t user0Count = 0;
 static uint32_t user1Count = 0;
 
-// Returns true if a valid key press just ended.
+// Returns true if a valid key press just ended
 static bool UpdateKey(int gpioId, uint32_t * counter) {
     bool pressed = false;
     Gpio_Get(gpioId, &pressed);
