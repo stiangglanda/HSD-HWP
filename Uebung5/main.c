@@ -4,6 +4,7 @@
 #include "StateMachine.h"
 #include "Key.h"
 #include "EventQueue.h"
+#include "Lcd.h"
 
 int main() {
 	__enable_irq();
@@ -13,6 +14,8 @@ int main() {
 
   EventQueue_Initialize();
   Key_Initialize();
+
+  Lcd_Initialize();
 
   StateMachine_Run(&State_A);
 }

@@ -86,6 +86,8 @@ returns: Zero on success, an error code otherwise.
 ******************************************************************************/
 void Lcd_Initialize(void); // changed to definition of the.c file
 
+
+int Lcd_FillBlack();
 /******************************************************************************
 Fills the specified rectangular region with the specified color.
 
@@ -103,7 +105,7 @@ returns: Zero on success, an error code otherwise.
 
 Pixels outside the display are are ignored. Other pixels are still set.
 ******************************************************************************/
-int Lcd_Fill(
+int Lcd_FillRectangle(
  uint_fast16_t x,
  uint_fast16_t y,
  uint_fast16_t width,

@@ -1,5 +1,6 @@
 #include "Lcd.h"
 #include "Gpio.h"
+#include <stm32f072xb.h>
 
 RGB565_t const RGB565_BLACK = { .R = 0x00, .G = 0x00, .B = 0x00 };
 RGB565_t const RGB565_GREY  = { .R = 0x0F, .G = 0x1F, .B = 0x0F };
@@ -12,27 +13,77 @@ RGB565_t const RGB565_BLUE  = { .R = 0x00, .G = 0x00, .B = 0x1F };
 #define CASET 
 #define RASET 
 
+static uint32_t GPIO_LCD_ON  = 0x04FF0000; // 4 = write, FF = data
+static uint32_t GPIO_LCD_OFF = 0x00000400; // 4 = write
+
 static inline void Lcd_Write(uint8_t data, bool command) {
 	// We start a transmission by setting WRX to low
+	Gpio_Set(GPIO_ID_TFT_WR, false);
 	
 	// Decide, whether command or data byte and control DCX
 	if (command) {
-		// Control DCX
-		
+		// Control DCX as command
+		Gpio_Set(GPIO_ID_TFT_DC, false);
 	} else {
-		// Control DCX
-		
+		// Control DCX as data
+		Gpio_Set(GPIO_ID_TFT_DC, true);
 	}
 	// We write data to our pins via BSRR
+	GPIOE->BSRR = (int32_t)(data | GPIO_LCD_ON);
+	GPIOE->BSRR = (int32_t)(GPIO_LCD_OFF);
 	
 	// We end a transmission by setting WRX to high
-	
+	Gpio_Set(GPIO_ID_TFT_WR, true);
+}
+
+int Lcd_FillBlack() {
+	// set CASET as 0x2A
+	Lcd_Write(0x2A, true);
+	Lcd_Write(0x00, false);
+	Lcd_Write(0x00, false);
+
+	Lcd_Write(0x00, false);
+	Lcd_Write(0xEF, false);
+
+	// set RASET as 0x2B
+	Lcd_Write(0x2B, true);
+	Lcd_Write(0x00, false);
+	Lcd_Write(0x00, false);
+
+	Lcd_Write(0x01, false);
+	Lcd_Write(0x3F, false);
+
+	// write to Mem as 0x2C
+	Lcd_Write(0x2C, true);
+
+	for (uint32_t position_y = 0; position_y < LCD_HEIGHT; position_y++) {
+		for (uint32_t position_x = 0; position_x < LCD_WIDTH; position_x++) {
+			Lcd_Write(0x00, false);
+			Lcd_Write(0x00, false);
+		}
+	}
+
+
 }
 
 void Lcd_Initialize(void) {
 	// ToDo: use GPIO_Initialize with relevant pins for CS, Data / Command, WR, RD, RES, DB0 - DB7
-	
-	
+	// TODO check return of initialization
+	Gpio_Initialize(GPIO_ID_TFT_CS, GPIO_MODE_OUTPUT, true);
+	Gpio_Initialize(GPIO_ID_TFT_WR, GPIO_MODE_OUTPUT, true);
+	Gpio_Initialize(GPIO_ID_TFT_RD, GPIO_MODE_OUTPUT, true);
+	Gpio_Initialize(GPIO_ID_TFT_RES, GPIO_MODE_OUTPUT, true);
+	Gpio_Initialize(GPIO_ID_TFT_DC, GPIO_MODE_OUTPUT, true);
+
+	Gpio_Initialize(GPIO_ID_TFT_DB0, GPIO_MODE_OUTPUT, true);
+	Gpio_Initialize(GPIO_ID_TFT_DB1, GPIO_MODE_OUTPUT, true);
+	Gpio_Initialize(GPIO_ID_TFT_DB2, GPIO_MODE_OUTPUT, true);
+	Gpio_Initialize(GPIO_ID_TFT_DB3, GPIO_MODE_OUTPUT, true);
+	Gpio_Initialize(GPIO_ID_TFT_DB4, GPIO_MODE_OUTPUT, true);
+	Gpio_Initialize(GPIO_ID_TFT_DB5, GPIO_MODE_OUTPUT, true);
+	Gpio_Initialize(GPIO_ID_TFT_DB6, GPIO_MODE_OUTPUT, true);
+	Gpio_Initialize(GPIO_ID_TFT_DB7, GPIO_MODE_OUTPUT, true);
+
 	// Initialization Code from exercise
 	Lcd_Write(0x11, true); //exit SLEEP mode
 	Lcd_Write(0x36, true);
@@ -94,6 +145,8 @@ void Lcd_Initialize(void) {
 	Lcd_Write(0x16, false);
 	Lcd_Write(0x19, false); // NVGAMCTRL: Negative Voltage Gamma control
 	Lcd_Write(0x29, true); // Display: On
+
+	FillBlack();
 }
 
 
