@@ -84,7 +84,7 @@ returns: Zero on success, an error code otherwise.
   0: Success
   1: Required GPIOs could not be initialized.
 ******************************************************************************/
-int Lcd_Initialize(void);
+void Lcd_Initialize(void); // changed to definition of the.c file
 
 /******************************************************************************
 Fills the specified rectangular region with the specified color.
