@@ -7,12 +7,13 @@
 /******************************************************************************
 Configuration
 ******************************************************************************/
-
+#define LCD_Command 0
+#define LCD_Data 1
 
 /******************************************************************************
 Defines the value to use if the LCD should be used in portrait mode.
 ******************************************************************************/
-#define LCD_MODE_PORTRAIT  1
+#define LCD_MODE_PORTRAIT 1
 
 /******************************************************************************
 Defines the value to use if the LCD should be used in landscape mode.
@@ -24,16 +25,44 @@ Configures the mode in which the LCD will be used.
 ******************************************************************************/
 #define LCD_MODE LCD_MODE_PORTRAIT
 
-
 /******************************************************************************
 Definitions
 ******************************************************************************/
 
-typedef struct RGB565_s { uint16_t B:5; uint16_t G:6; uint16_t R:5; } RGB565_t;
-typedef struct Image_s { uint16_t Width; uint16_t Height; RGB565_t const * Data; } Image_t;
-typedef struct MonochromeImage_s { uint16_t Width; uint16_t Height; uint8_t const * Data; } MonochromeImage_t;
-typedef struct Glyph_s { uint8_t const * Data; uint16_t Width; uint64_t:16; } Glyph_t;
-typedef struct Font_s { Glyph_t const * (*GetGlyph)(char); uint16_t LineHeight; uint64_t:16; } Font_t;
+typedef struct RGB565_s
+{
+  uint16_t B : 5;
+  uint16_t G : 6;
+  uint16_t R : 5;
+} RGB565_t;
+
+typedef struct Image_s
+{
+  uint16_t Width;
+  uint16_t Height;
+  RGB565_t const *Data;
+} Image_t;
+
+typedef struct MonochromeImage_s
+{
+  uint16_t Width;
+  uint16_t Height;
+  uint8_t const *Data;
+} MonochromeImage_t;
+
+typedef struct Glyph_s
+{
+  uint8_t const *Data;
+  uint16_t Width;
+  uint64_t : 16;
+} Glyph_t;
+
+typedef struct Font_s
+{
+  Glyph_t const *(*GetGlyph)(char);
+  uint16_t LineHeight;
+  uint64_t : 16;
+} Font_t;
 
 extern RGB565_t const RGB565_BLACK;
 extern RGB565_t const RGB565_GREY;
@@ -47,19 +76,18 @@ extern Font_t const SegoeUI;
 extern Image_t const Image;
 extern MonochromeImage_t const Image2;
 
-
 #if LCD_MODE == LCD_MODE_PORTRAIT
 
 /******************************************************************************
 Defines the width of the display in pixel.
 ******************************************************************************/
-#define LCD_WIDTH  240
+#define LCD_WIDTH 240
 
 /******************************************************************************
 Defines the height of the display in pixel.
 ******************************************************************************/
 #define LCD_HEIGHT 320
-	
+
 #endif
 
 #if LCD_MODE == LCD_MODE_LANDSCAPE
@@ -67,17 +95,14 @@ Defines the height of the display in pixel.
 /******************************************************************************
 Defines the width of the display in pixel.
 ******************************************************************************/
-#define LCD_WIDTH  320
-	
+#define LCD_WIDTH 320
+
 /******************************************************************************
 Defines the height of the display in pixel.
 ******************************************************************************/
 #define LCD_HEIGHT 240
 
 #endif
-
-void SetToBlack(void);
-void SetToWhite(void);
 
 /******************************************************************************
 Initializes the LCD module and the required GPIOs.
@@ -106,11 +131,11 @@ returns: Zero on success, an error code otherwise.
 Pixels outside the display are are ignored. Other pixels are still set.
 ******************************************************************************/
 int Lcd_Fill(
- uint_fast16_t x,
- uint_fast16_t y,
- uint_fast16_t width,
- uint_fast16_t height,
- RGB565_t      color);
+    uint_fast16_t x,
+    uint_fast16_t y,
+    uint_fast16_t width,
+    uint_fast16_t height,
+    RGB565_t color);
 
 /******************************************************************************
 Draws the specified RGB565 image at the specified location.
@@ -130,11 +155,11 @@ returns: Zero on success, an error code otherwise.
 Pixels outside the display are are ignored. Other pixels are still set.
 ******************************************************************************/
 int Lcd_Draw(
- uint_fast16_t    x,
- uint_fast16_t    y,
- uint_fast16_t    width,
- uint_fast16_t    height,
- RGB565_t const * data);
+    uint_fast16_t x,
+    uint_fast16_t y,
+    uint_fast16_t width,
+    uint_fast16_t height,
+    RGB565_t const *data);
 
 /******************************************************************************
 Draws the specified monochrome image at the specified location.
@@ -156,13 +181,13 @@ returns: Zero on success, an error code otherwise.
 Pixels outside the display are are ignored. Other pixels are still set.
 ******************************************************************************/
 int Lcd_DrawMonochrome(
- uint_fast16_t   x,
- uint_fast16_t   y,
- uint_fast16_t   width,
- uint_fast16_t   height,
- uint8_t const * data,
- RGB565_t        foreground,
- RGB565_t        background);
+    uint_fast16_t x,
+    uint_fast16_t y,
+    uint_fast16_t width,
+    uint_fast16_t height,
+    uint8_t const *data,
+    RGB565_t foreground,
+    RGB565_t background);
 
 /******************************************************************************
 Prints the specified character at the specified location and advances the
@@ -181,12 +206,12 @@ returns: Zero on success, an error code otherwise.
 3: One or more pixels are outside the available display area.
 ******************************************************************************/
 int Lcd_PrintCharacter(
- uint_fast16_t * x,
- uint_fast16_t * y,
- char            character,
- RGB565_t        foreground,
- RGB565_t        background,
- Font_t const  * font);
+    uint_fast16_t *x,
+    uint_fast16_t *y,
+    char character,
+    RGB565_t foreground,
+    RGB565_t background,
+    Font_t const *font);
 
 /******************************************************************************
 Prints the specified string at the specified location.
@@ -204,11 +229,14 @@ returns: Zero on success, an error code otherwise.
 3: One or more pixels are outside the available display area.
 ******************************************************************************/
 int Lcd_Print(
- uint_fast16_t   x,
- uint_fast16_t   y,
- char const    * string,
- RGB565_t        foreground,
- RGB565_t        background,
- Font_t const  * font);
+    uint_fast16_t x,
+    uint_fast16_t y,
+    char const *string,
+    RGB565_t foreground,
+    RGB565_t background,
+    Font_t const *font);
+
+void SetToWhite(void);
+void SetToBlack(void);
 
 #endif // LCD_H
