@@ -2,8 +2,6 @@
 #include "Gpio.h"
 #include <stm32f072xb.h>
 
-#define GPIO_LOW false
-#define GPIO_HIGH true
 #define LCD_Command 0
 #define LCD_Data 1
 
@@ -105,11 +103,6 @@ int Lcd_Initialize(void) {
 	Lcd_Write(0x19, LCD_Data); // NVGAMCTRL: Negative Voltage Gamma control
 	Lcd_Write(0x29, LCD_Command); // Display: On
 	
-	for (int i = 0; i < 2; i++) {
-		SetToBlack();
-		SetToWhite();
-	}	
-		
 	return 0;	
 }
 

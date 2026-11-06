@@ -5,6 +5,8 @@
 // Include C standard library header files.
 #include <stdbool.h>
 
+#define GPIO_LOW 0
+#define GPIO_HIGH 1
 
 /*******************************************************************************
 Defines the IDs for all GPIOs.

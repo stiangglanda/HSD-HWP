@@ -9,9 +9,6 @@ int main() {
     Lcd_Initialize();
 
     while (true) {
-      SetToBlack();
-
-      SetToWhite();
     }
 }
 
