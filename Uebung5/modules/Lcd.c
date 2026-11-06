@@ -4,8 +4,8 @@
 
 #define GPIO_LOW false
 #define GPIO_HIGH true
-#define LCD_Command true
-#define LCD_Data false
+#define LCD_Command 0
+#define LCD_Data 1
 
 #define BYTEMASK 0xFF
 #define DATALINE_RESET_OFFSET 16
