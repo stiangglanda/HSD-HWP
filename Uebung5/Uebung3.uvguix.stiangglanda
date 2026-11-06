@@ -3758,7 +3758,7 @@
         <PaneID>0</PaneID>
       </Doc>
       <Doc>
-        <Name>modules\LCD.h</Name>
+        <Name>modules\Lcd.h</Name>
         <ColumnNumber>34</ColumnNumber>
         <TopLine>73</TopLine>
         <CurrentLine>95</CurrentLine>

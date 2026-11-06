@@ -22,6 +22,9 @@
 static uint32_t const GPIO_LCD_BSSR_WRITE_ON = (uint32_t)(CLEAR_WR_MASK | CLEAR_DATALINE_MASK); // 0x04FF0000
 static uint32_t const GPIO_LCD_BSSR_WRITE_OFF = (uint32_t)(SET_WR_MASK);	// 0x00000400
 
+void SetToBlack(void);
+void SetToWhite(void);
+
 static inline void Lcd_Write(uint8_t data, bool command){
   Gpio_Set(GPIO_ID_TFT_DC, !command);  						// Data (1) or command (0) byte
   GPIOE->BSRR = (GPIO_LCD_BSSR_WRITE_ON | data); 	// enable writing mode + write data
