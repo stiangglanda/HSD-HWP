@@ -8,7 +8,11 @@ int main() {
 
     Lcd_Initialize();
 
-    while (true) {}
+    while (true) {
+      SetToBlack();
+
+      SetToWhite();
+    }
 }
 
 void Systemconfig_Clock(void) {
