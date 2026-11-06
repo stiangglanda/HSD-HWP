@@ -242,7 +242,33 @@ int Lcd_DrawMonochrome(uint_fast16_t x, uint_fast16_t y, uint_fast16_t width, ui
 	return 0;
 }
 
-int Lcd_PrintCharacter(uint_fast16_t x, uint_fast16_t y, char character, RGB565_t foreground, RGB565_t background, Font_t const * font) {
+int Lcd_PrintCharacter(uint_fast16_t* x, uint_fast16_t* y, char character, RGB565_t foreground, RGB565_t background, Font_t const * font) {
 	// TODO: Implement character printing
+
+	//Access font height and width / font->glyph width
+	//Lcd_beginWrite(x, y, font->width, font->height);
+
+	//iterate over with and height
+		// is pixel the ninth bit?
+			// Change / increment pointer
+		//Derefrence pointer for uint8_t value
+		//is bit high =1
+			//lcd_writePixel(foreground)
+		//is bit low =0
+			//lcd_writePixel(background)
+
+	// increment x if possible by glyph width
+		//check wether y increment is possible
+			// increment y
+		//return error
+	return 0; 
+}
+
+int Lcd_Print(uint_fast16_t * x, uint_fast16_t * y, char const * string, RGB565_t foreground, RGB565_t background, Font_t const * font) {
+	while (*string != '\0') {
+		Lcd_PrintCharacter(x, y, *string, foreground, background, font);
+		(*x) += font->width; // Move to the next character position
+		string++;
+	}
 	return 0;
 }
