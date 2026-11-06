@@ -211,3 +211,38 @@ int Lcd_Fill(uint_fast16_t x, uint_fast16_t y, uint_fast16_t width, uint_fast16_
 	
 	return 0;
 }
+
+int Lcd_Draw(uint_fast16_t x, uint_fast16_t y, uint_fast16_t width, uint_fast16_t height, RGB565_t const * data) {
+	Lcd_BeginWrite(x, y, width, height);
+	
+	for (uint32_t index_y = 0; index_y < height; index_y++) {
+		for (uint32_t index_x = 0; index_x < width; index_x++) {
+			Lcd_WritePixel(data[index_y * width + index_x]);
+		}
+	}
+	
+	return 0;
+}
+
+int Lcd_DrawMonochrome(uint_fast16_t x, uint_fast16_t y, uint_fast16_t width, uint_fast16_t height, uint8_t const * data, RGB565_t foreground, RGB565_t background) {
+	Lcd_BeginWrite(x, y, width, height);
+	
+	for (uint32_t index_y = 0; index_y < height; index_y++) {
+		for (uint32_t index_x = 0; index_x < width; index_x++) {
+			uint8_t byte = data[(index_y * width + index_x) / 8];
+			uint8_t bit = (byte >> (7 - (index_x % 8))) & 0x01;
+			if (bit) {
+				Lcd_WritePixel(foreground);
+			} else {
+				Lcd_WritePixel(background);
+			}
+		}
+	}
+	
+	return 0;
+}
+
+int Lcd_PrintCharacter(uint_fast16_t x, uint_fast16_t y, char character, RGB565_t foreground, RGB565_t background, Font_t const * font) {
+	// TODO: Implement character printing
+	return 0;
+}
