@@ -84,10 +84,8 @@ returns: Zero on success, an error code otherwise.
   0: Success
   1: Required GPIOs could not be initialized.
 ******************************************************************************/
-void Lcd_Initialize(void); // changed to definition of the.c file
+int Lcd_Initialize(void);
 
-
-int Lcd_FillBlack();
 /******************************************************************************
 Fills the specified rectangular region with the specified color.
 
@@ -105,7 +103,7 @@ returns: Zero on success, an error code otherwise.
 
 Pixels outside the display are are ignored. Other pixels are still set.
 ******************************************************************************/
-int Lcd_FillRectangle(
+int Lcd_Fill(
  uint_fast16_t x,
  uint_fast16_t y,
  uint_fast16_t width,
