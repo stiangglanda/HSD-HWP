@@ -76,6 +76,8 @@ Defines the height of the display in pixel.
 
 #endif
 
+void SetToBlack(void);
+void SetToWhite(void);
 
 /******************************************************************************
 Initializes the LCD module and the required GPIOs.

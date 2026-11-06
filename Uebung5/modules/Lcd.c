@@ -22,9 +22,6 @@
 static uint32_t const GPIO_LCD_BSSR_WRITE_ON = (uint32_t)(CLEAR_WR_MASK | CLEAR_DATALINE_MASK); // 0x04FF0000
 static uint32_t const GPIO_LCD_BSSR_WRITE_OFF = (uint32_t)(SET_WR_MASK);	// 0x00000400
 
-void SetToBlack(void);
-void SetToWhite(void);
-
 static inline void Lcd_Write(uint8_t data, bool command){
   Gpio_Set(GPIO_ID_TFT_DC, !command);  						// Data (1) or command (0) byte
   GPIOE->BSRR = (GPIO_LCD_BSSR_WRITE_ON | data); 	// enable writing mode + write data
@@ -244,6 +241,12 @@ int Lcd_DrawMonochrome(uint_fast16_t x, uint_fast16_t y, uint_fast16_t width, ui
 
 int Lcd_PrintCharacter(uint_fast16_t* x, uint_fast16_t* y, char character, RGB565_t foreground, RGB565_t background, Font_t const * font) {
 	// TODO: Implement character printing
+	(void)x;
+	(void)y;
+	(void)character;
+	(void)foreground;
+	(void)background;
+	(void)font;
 
 	//Access font height and width / font->glyph width
 	//Lcd_beginWrite(x, y, font->width, font->height);
@@ -264,10 +267,12 @@ int Lcd_PrintCharacter(uint_fast16_t* x, uint_fast16_t* y, char character, RGB56
 	return 0; 
 }
 
-int Lcd_Print(uint_fast16_t * x, uint_fast16_t * y, char const * string, RGB565_t foreground, RGB565_t background, Font_t const * font) {
+int Lcd_Print(uint_fast16_t x, uint_fast16_t y, char const * string, RGB565_t foreground, RGB565_t background, Font_t const * font) {
 	while (*string != '\0') {
-		Lcd_PrintCharacter(x, y, *string, foreground, background, font);
-		(*x) += font->width; // Move to the next character position
+		uint_fast16_t character_x = x;
+		uint_fast16_t character_y = y;
+		Lcd_PrintCharacter(&character_x, &character_y, *string, foreground, background, font);
+		x += font->GetGlyph(*string)->Width;
 		string++;
 	}
 	return 0;
