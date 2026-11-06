@@ -1,0 +1,51 @@
+; Unser STM32F072VBT6 hat 16 KiB SRAM, 0x20000000..0x20003FFF.
+; LR_SRAM definiert die STARTADRESSE und die LÄNGE aller internen Bereiche.
+
+LR_SRAM 0x20000000 0x00004000
+{
+	; Hier liegen die Vektortabelle, unsere Konstanten, unser Code, unsere RW_Daten und unser Stack.
+	
+	; Die Vektortabelle liegt am Start der Region SRAM (0x20000000) mit LÄNGE 0x00000100
+    ER_VECTORS 0x20000000 FIXED 0x00000100
+    {
+		; Aus startup_stm32f072xb.s wird startup_stm32f072xb.o. Wir nehmen das Label RESET an den Start (+FIRST) von 0x20000000 
+        startup_stm32f072xb.o (RESET, +FIRST)
+    }
+
+	; Unsere Konstanten BEGINNEN bei 0x20000100 mit LÄNGE 0x00000100.
+    ER_CONST 0x20000100 FIXED 0x00000100
+    {
+		; Unsere Konstanten sind in Region DEMO_RO nach dem compilieren von main.c definiert.
+		; Sie werden hier dem Start (+FIRST) von ER_CONST zugewiesen.
+        main.o (DEMO_RO, +FIRST)
+    }
+
+	; Unser Code BEGINNT bei 0x20000200 und ist 0x00001E00 LANG.
+    ER_CODE 0x20000200 FIXED 0x00001E00
+    {
+		; Die Codesektion beginnt bei unserem Resethandler in startup_stm32f072xb.s (.o).
+        ; Dies ist die |.text| AREA des Files.
+        startup_stm32f072xb.o (.text, +FIRST)
+		; Es folgen weitere Codesegmente in allen anderen, übersetzten Files
+        *(InRoot$$Sections)
+        .ANY (+RO)
+    }
+
+	; Unsere RW-Daten BEGINNEN bei 0x20002000 und sind 0x00001800 LANG.
+    RW_DATA 0x20002000 FIXED 0x00001800
+    {
+		; Wir beginnen bei der Sektion DEMO_RW in main.c und lassen alle weiteren RW oder ZI Sektionen zu.
+        main.o (DEMO_RW, +FIRST)
+        .ANY (+RW +ZI)
+    }
+
+    ; Hier definieren wir den Adressraum unseres Stacks.
+	; Der Speicher BEGINNT bei 0x20003800 und ist 0x00000800.
+	; Er wird nicht initialisiert
+	; UNINIT verhindert das Nullsetzen dieses bereits benutzten Stacks.
+    RW_STACK 0x20003800 UNINIT 0x00000800
+    {
+		; Wir geben hier die STACK-Region aus startup_stm32f072xb.s an.
+        startup_stm32f072xb.o (STACK)
+    }
+}
