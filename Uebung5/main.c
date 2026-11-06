@@ -1,21 +1,29 @@
-#include <stm32f072xb.h>
-#include "Timer.h"
-#include "Gpio.h"
-#include "StateMachine.h"
-#include "Key.h"
-#include "EventQueue.h"
 #include "Lcd.h"
+#include <stm32f072xb.h>
+
+void Systemconfig_Clock(void);
 
 int main() {
-	__enable_irq();
+    Systemconfig_Clock();
 
-	Gpio_Initialize(GPIO_ID_LED3, GPIO_MODE_OUTPUT, true);
-	Gpio_Initialize(GPIO_ID_LED4, GPIO_MODE_OUTPUT, true);
+    Lcd_Initialize();
 
-  EventQueue_Initialize();
-  Key_Initialize();
+    while (true) {}
+}
 
-  Lcd_Initialize();
+void Systemconfig_Clock(void) {
+    // Enable the internal 48 MHz Oscillator
+    RCC->CR2 |= RCC_CR2_HSI48ON;
+    while ((RCC->CR2 & RCC_CR2_HSI48RDY) == 0) {}
 
-  StateMachine_Run(&State_A);
+    // Configure flash before setting new clock frequency
+    FLASH->ACR |= FLASH_ACR_LATENCY | FLASH_ACR_PRFTBE;
+
+    RCC->CFGR = (RCC->CFGR &
+                 ~(RCC_CFGR_SW | RCC_CFGR_HPRE | RCC_CFGR_PPRE))
+                 | RCC_CFGR_SW_HSI48;
+
+    while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI48) {}
+
+    SystemCoreClock = 48000000U;
 }

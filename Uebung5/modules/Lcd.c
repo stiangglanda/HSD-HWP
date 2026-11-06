@@ -167,3 +167,47 @@ void SetToBlack(void) {
 		}
 	}
 }
+
+void Lcd_BeginWrite(uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
+	// WRITE CASET with fixed start and stop
+	Lcd_Write(0x2A, LCD_Command);
+
+	// TODO: Calculate Start High Byte / Low Byte for XStart
+	//Lcd_Write(0x00, LCD_Data);
+	//Lcd_Write(0x00, LCD_Data);
+
+	//TODO: Calculate Stop High Byte / Low Byte for XEnd
+	//Lcd_Write(0x00, LCD_Data);
+	//Lcd_Write(0xEF, LCD_Data);
+	
+	// WRITE RASET with fixed start and stop
+	Lcd_Write(0x2B, LCD_Command);
+	// TODO: Calculate Start High Byte / Low Byte for YStart
+	//Lcd_Write(0x00, LCD_Data);
+	//Lcd_Write(0x00, LCD_Data);
+
+	//TODO: Calculate Stop High Byte / Low Byte for YEnd
+	//Lcd_Write(0x01, LCD_Data);
+	//Lcd_Write(0x3F, LCD_Data);
+
+	// Memory Write
+	Lcd_Write(0x2C, LCD_Command);	
+}
+
+void Lcd_WritePixel(RGB565_t color) {
+	//TODO: Convert RGB565_t to uint8_t Bytes
+	//Lcd_Write(0x00, LCD_Data); //Red and Green Bits
+	//Lcd_Write(0x00, LCD_Data); // Green and Blue Bits
+}
+
+int Lcd_Fill(uint_fast16_t x, uint_fast16_t y, uint_fast16_t width, uint_fast16_t height, RGB565_t color) {
+	Lcd_BeginWrite(x, y, width, height);
+	
+	for (uint32_t index_y = 0; index_y < height; index_y++) {
+		for (uint32_t index_x = 0; index_x < width; index_x++) {
+			Lcd_WritePixel(color);
+		}
+	}
+	
+	return 0;
+}
