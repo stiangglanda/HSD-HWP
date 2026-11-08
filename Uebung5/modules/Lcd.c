@@ -1,5 +1,6 @@
-#include "LCD.h"
+#include "Lcd.h"
 #include "Gpio.h"
+#include <stddef.h>
 #include <stm32f072xb.h>
 
 #define BYTEMASK 0xFF
@@ -24,7 +25,7 @@ static inline void Lcd_Write(uint8_t data, bool command)
 	GPIOE->BSRR = GPIO_LCD_BSSR_WRITE_OFF;			  // disable writing mode
 }
 
-int Lcd_Initialize(void)
+void Lcd_Initialize(void)
 {
 	Gpio_Initialize(GPIO_ID_TFT_CS, GPIO_MODE_OUTPUT, GPIO_LOW);
 	Gpio_Initialize(GPIO_ID_TFT_DC, GPIO_MODE_OUTPUT, GPIO_LOW);
@@ -107,8 +108,6 @@ int Lcd_Initialize(void)
 		SetToBlack();
 		SetToWhite();
 	}
-
-	return 0;
 }
 
 void SetToWhite(void)
@@ -169,31 +168,56 @@ void SetToBlack(void)
 	}
 }
 
+static void Lcd_SetArea(
+	 uint_fast16_t xStart,
+	 uint_fast16_t xEnd,
+	 uint_fast16_t yStart,
+	 uint_fast16_t yEnd)
+{
+	Lcd_Write(0x2A, LCD_Command); // CASET
+	Lcd_Write((uint8_t)(xStart >> 8), LCD_Data);
+	Lcd_Write((uint8_t)(xStart & 0xFF), LCD_Data);
+	Lcd_Write((uint8_t)(xEnd >> 8), LCD_Data);
+	Lcd_Write((uint8_t)(xEnd & 0xFF), LCD_Data);
+
+	Lcd_Write(0x2B, LCD_Command); // RASET
+	Lcd_Write((uint8_t)(yStart >> 8), LCD_Data);
+	Lcd_Write((uint8_t)(yStart & 0xFF), LCD_Data);
+	Lcd_Write((uint8_t)(yEnd >> 8), LCD_Data);
+	Lcd_Write((uint8_t)(yEnd & 0xFF), LCD_Data);
+}
+
 void Lcd_BeginWrite(uint16_t x, uint16_t y, uint16_t width, uint16_t height)
 {
-	Lcd_Write(0x2A, LCD_Command);
-	Lcd_Write(0x2B, LCD_Command);
-	Lcd_Write(0x2C, LCD_Command);
+	Lcd_SetArea(x, x + width - 1, y, y + height - 1);
+	Lcd_Write(0x2C, LCD_Command); // RAMWR
 }
 
 void Lcd_WritePixel(RGB565_t color)
 {
-	// Todo: Convert RGB565 to uint8_t bytes
-	// Lcd_Write(0x00, LCD_Data);
-	// Lcd_Write(0x00, LCD_Data);
+	uint16_t value = (uint16_t)((color.R << 11) | (color.G << 5) | color.B);
+	Lcd_Write((uint8_t)(value >> 8), LCD_Data);
+	Lcd_Write((uint8_t)(value & 0xFF), LCD_Data);
 }
 
-int Lcd_Fill(
+int Lcd_FillRectangle(
 	 uint_fast16_t x,
 	 uint_fast16_t y,
 	 uint_fast16_t width,
 	 uint_fast16_t height,
 	 RGB565_t color)
 {
-	// Lcd_BeginWrite mit x, y, width and height
+	if (width == 0 || height == 0 || x + width > LCD_WIDTH || y + height > LCD_HEIGHT)
+	{
+		return -1;
+	}
 
-	// Iterate over calculated pixels
-	// Lcd_WritePixel()
+	Lcd_BeginWrite(x, y, width, height);
+
+	for (uint32_t i = 0; i < width * height; i++)
+	{
+		Lcd_WritePixel(color);
+	}
 	return 0;
 }
 
@@ -204,13 +228,17 @@ int Lcd_Draw(
 	 uint_fast16_t height,
 	 RGB565_t const *data)
 {
-	// Lcd_BeginWrite mit x, y, width and height
+	if (width == 0 || height == 0 || x + width > LCD_WIDTH || y + height > LCD_HEIGHT)
+	{
+		return -1;
+	}
 
-	// Iterate over width and height
-	// Dereference pointer for RGB value
-	// Lcd_WritePixel()
-	// Increment Pointer
+	Lcd_BeginWrite(x, y, width, height);
 
+	for (uint32_t i = 0; i < width * height; i++)
+	{
+		Lcd_WritePixel(data[i]);
+	}
 	return 0;
 }
 
@@ -223,47 +251,80 @@ int Lcd_DrawMonochrome(
 	 RGB565_t foreground,
 	 RGB565_t background)
 {
-	// Lcd_BeginWrite mit x, y, width and height
+	if (width == 0 || height == 0)
+	{
+		return -1;
+	}
 
-	// Iterate over width and height
-	// Is pixel the ninth bit?
-	// Change / increment pointer.
-	// Dereference pointer for uint8_value
-	// Is Bit high = 1
-	// Lcd_WritePixel(foreground)
-	// Is Bit low = 0
-	// Lcd_WritePixel(background)
-	// Lcd_WritePixel()
+	// Image is completely outside the display
+	if (x >= LCD_WIDTH || y >= LCD_HEIGHT)
+	{
+		return 0;
+	}
 
-	// Increment Pointer
+	// Only draw the visible part
+	uint_fast16_t visibleWidth = (x + width > LCD_WIDTH) ? (LCD_WIDTH - x) : width;
+	uint_fast16_t visibleHeight = (y + height > LCD_HEIGHT) ? (LCD_HEIGHT - y) : height;
+
+	Lcd_BeginWrite(x, y, visibleWidth, visibleHeight);
+
+	for (uint_fast16_t row = 0; row < visibleHeight; row++)
+	{
+		for (uint_fast16_t col = 0; col < visibleWidth; col++)
+		{
+			uint_fast16_t bitIndex = row * width + col;
+			// Read pixel bit: pick the byte, shift the bit to the right end, keep only that bit
+			uint8_t bit = (data[bitIndex / 8] >> (bitIndex % 8)) & 1;
+
+			Lcd_WritePixel(bit ? foreground : background);
+		}
+	}
 
 	return 0;
 }
 
 int Lcd_PrintCharacter(
-	 uint_fast16_t *x,
-	 uint_fast16_t *y,
+	 uint_fast16_t *px,
+	 uint_fast16_t *py,
 	 char character,
 	 RGB565_t foreground,
 	 RGB565_t background,
 	 Font_t const *font)
 {
-	// Access font height / font->glyph width
-	// Lcd_BeginWrite mit x, y, width and height
+	if (px == NULL || py == NULL || font == NULL)
+	{
+		return -1;
+	}
 
-	// Iterate over width and height
-	// Is pixel the ninth bit?
-	// Change / increment pointer.
-	// Dereference pointer for uint8_value
-	// Is Bit high = 1
-	// Lcd_WritePixel(foreground)
-	// Is Bit low = 0
-	// Lcd_WritePixel(background)
-	// increment x if possible by glyph width
-	// check, wether y increment is possible
-	// increment y
-	// return error
-	return 0;
+	if (character == '\n')
+	{
+		*py += font->LineHeight;
+		return 0;
+	}
+
+	if (character == '\t')
+	{
+		// Tab = 4 spaces
+		for (int i = 0; i < 4; i++)
+		{
+			int result = Lcd_PrintCharacter(px, py, ' ', foreground, background, font);
+			if (result != 0)
+			{
+				return result;
+			}
+		}
+		return 0;
+	}
+
+	Glyph_t const *glyph = font->GetGlyph(character);
+	if (glyph == NULL)
+	{
+		return -1;
+	}
+
+	int result = Lcd_DrawMonochrome(*px, *py, glyph->Width, font->LineHeight, glyph->Data, foreground, background);
+	*px += glyph->Width;
+	return result;
 }
 
 int Lcd_Print(
@@ -274,10 +335,25 @@ int Lcd_Print(
 	 RGB565_t background,
 	 Font_t const *font)
 {
-	// Define x and y as variables
+	if (string == NULL)
+	{
+		return -1;
+	}
 
-	// Iterate over each valid character in string until \0
-	// Dereference current character
-	// stillValid = Lcd_PrintCharacter()
+	uint_fast16_t startX = x;
+
+	for (char const *c = string; *c != '\0'; c++)
+	{
+		int result = Lcd_PrintCharacter(&x, &y, *c, foreground, background, font);
+		if (result != 0)
+		{
+			return result;
+		}
+
+		if (*c == '\n')
+		{
+			x = startX; // new line starts at the left again
+		}
+	}
 	return 0;
 }
