@@ -110,4 +110,15 @@ static int Tsc_ReadRaw(bool* touched, uint16_t* x, uint16_t* y) {
 
 	Gpio_Set(GPIO_ID_TOUCH_CS, true);
 	Tsc_Delay();
+
+	Gpio_Get(GPIO_ID_TOUCH_PENIRQ, &penirq_high);
+	*touched = !penirq_high;
+
+	if (!*touched) {
+		return -2;
+	}
+
+	return 0; //Success
 }
+
+int Tsc_Read(bool *touched, uint16_t * x, uint16_t * y, uint8_t samples);
