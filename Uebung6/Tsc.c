@@ -74,3 +74,40 @@ static uint8_t Tsc_ReadByte(void){
 	}
 	return data;
 }
+
+static int Tsc_ReadRaw(bool* touched, uint16_t* x, uint16_t* y) {
+	bool penirq_high = true;
+	Gpio_Get(GPIO_ID_TOUCH_PENIRQ, &penirq_high);
+
+	*touched = !penirq_high;
+	if (!*touched) {
+		*x = 0xFFFF;
+		*y = 0xFFFF;
+
+		return -1; //Not touched
+	}
+
+	// We set CS to low to enable writing and reading
+	Gpio_Set(GPIO_ID_TOUCH_CS, false);
+
+	Tsc_Delay();
+
+	// X-Wert als 12Bit Wert
+	Tsc_WriteByte(0xD0);
+
+	uint8_t high_byte = Tsc_ReadByte();
+	uint8_t low_byte = Tsc_ReadByte();
+
+	// ToDo: x* = high | low correctly shifted and masked
+
+	// Y-Wert als 12Bit Wert
+	Tsc_WriteByte(0x90);
+
+	uint8_t high_byte = Tsc_ReadByte();
+	uint8_t low_byte = Tsc_ReadByte();
+
+	// ToDo: y* = high | low correctly shifted and masked
+
+	Gpio_Set(GPIO_ID_TOUCH_CS, true);
+	Tsc_Delay();
+}
