@@ -4,9 +4,7 @@
 #include "stdint.h"
 #include "stdbool.h"
 
-void Tsc_Initialize(void) {
-
-}
+void Tsc_Initialize(void);
 
 /****************************************************************************** 
 Retrieves raw data from the TSC. 
