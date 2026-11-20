@@ -12,13 +12,6 @@ typedef struct {
     uint16_t y;
 } CalPoint_t;
 
-typedef struct {
-    float x_offset;
-    float y_offset;
-    float x_scale;
-    float y_scale;
-} CalData_t;
-
 static const RGB565_t COLOR_BLACK = { .R = 0,  .G = 0,  .B = 0  };
 static const RGB565_t COLOR_BLUE  = { .R = 0,  .G = 0,  .B = 31 };
 static const RGB565_t COLOR_WHITE = { .R = 31, .G = 63, .B = 31 };
@@ -31,7 +24,7 @@ static const uint16_t cornerPos[4][2] = {
 };
 
 static CalPoint_t rawCorners[4];
-static CalData_t calData;
+static Tsc_Calibration_t calData;
 static uint8_t currentCorner = 0;
 static bool waitForRelease = false;
 
@@ -60,6 +53,8 @@ static void CalculateCalibration(void) {
     if (avgDistY != 0.0f) {
         calData.y_scale = (float)(LCD_HEIGHT - CAL_OBJ_SIZE) / avgDistY;
     }
+
+    Tsc_SetCalibration(&calData);
 }
 
 static void Enter(void) {
@@ -84,7 +79,7 @@ static State_t const * Process(void) {
 
             if (currentCorner >= 4) {
                 CalculateCalibration();
-                return &State_A; // Calibration done
+                return &State_Paint; // Calibration done
             }
 
             // Mark next corner

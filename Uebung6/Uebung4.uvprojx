@@ -405,19 +405,9 @@
               <FilePath>.\modules\Timer.c</FilePath>
             </File>
             <File>
-              <FileName>State_A.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\State_A.c</FilePath>
-            </File>
-            <File>
               <FileName>StateMachine.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\StateMachine.h</FilePath>
-            </File>
-            <File>
-              <FileName>State_B.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\State_B.c</FilePath>
             </File>
             <File>
               <FileName>StateMachine.c</FileName>
@@ -478,6 +468,11 @@
               <FileName>State_Calibration.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\State_Calibration.c</FilePath>
+            </File>
+            <File>
+              <FileName>State_Paint.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\State_Paint.c</FilePath>
             </File>
           </Files>
         </Group>

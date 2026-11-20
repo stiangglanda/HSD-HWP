@@ -4,6 +4,13 @@
 #include "stdint.h"
 #include "stdbool.h"
 
+typedef struct {
+    float x_offset;
+    float y_offset;
+    float x_scale;
+    float y_scale;
+} Tsc_Calibration_t;
+
 void Tsc_Initialize(void);
 
 /****************************************************************************** 
@@ -32,6 +39,7 @@ and the function returns immediately.
 ******************************************************************************/ 
 int Tsc_Read(bool *touched, uint16_t * x, uint16_t * y, uint8_t samples);
 
-bool Tsc_TestRead(uint16_t *x, uint16_t *y);
+void Tsc_SetCalibration(Tsc_Calibration_t const * cal);
+void Tsc_ConvertToLcd(uint16_t xTsc, uint16_t yTsc, uint16_t * xLcd, uint16_t * yLcd);
 
 #endif

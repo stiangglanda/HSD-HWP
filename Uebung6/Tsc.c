@@ -1,4 +1,5 @@
 #include "Tsc.h"
+#include "Lcd.h"
 #include "Gpio.h"
 
 #define TSC_SAMPLES_NULL -1
@@ -164,30 +165,36 @@ int Tsc_Read(bool *touched, uint16_t * x, uint16_t * y, uint8_t samples){
 	return 0;
 }
 
-bool Tsc_TestRead(uint16_t *x, uint16_t *y) {
-    bool penIrq = true;
-    Gpio_Get(GPIO_ID_TOUCH_PENIRQ, &penIrq);
+static Tsc_Calibration_t tscCal = {
+    .x_offset = 0.0f,
+    .y_offset = 0.0f,
+    .x_scale  = 1.0f,
+    .y_scale  = 1.0f
+};
 
-    // PENIRQ ist active-low: false bedeutet, Display wird berührt
-    if (penIrq) {
-        return false;
+void Tsc_SetCalibration(Tsc_Calibration_t const * cal) {
+    if (cal != 0) {
+        tscCal = *cal;
+    }
+}
+
+void Tsc_ConvertToLcd(uint16_t xTsc, uint16_t yTsc, uint16_t * xLcd, uint16_t * yLcd) {
+    float x = tscCal.x_scale * ((float)xTsc - tscCal.x_offset);
+    float y = tscCal.y_scale * ((float)yTsc - tscCal.y_offset);
+
+    // Begrenzung auf gültige Display-Grenzen (verhindert Unterlauf/Überlauf bei uint16_t)
+    if (x < 0.0f) {
+        x = 0.0f;
+    } else if (x >= (float)LCD_WIDTH) {
+        x = (float)(LCD_WIDTH - 1U);
     }
 
-    Gpio_Set(GPIO_ID_TOUCH_CS, false); // nCS Low -> Chip aktivieren
+    if (y < 0.0f) {
+        y = 0.0f;
+    } else if (y >= (float)LCD_HEIGHT) {
+        y = (float)(LCD_HEIGHT - 1U);
+    }
 
-    // X-Wert lesen (Kommando 0xD0: 12-Bit, Differential, PENIRQ aktiv)
-    Tsc_WriteByte(0xD0);
-    uint8_t xHi = Tsc_ReadByte();
-    uint8_t xLo = Tsc_ReadByte();
-    *x = (uint16_t)(((uint16_t)xHi << 5) | ((uint16_t)xLo >> 3)) & 0x0FFF;
-
-    // Y-Wert lesen (Kommando 0x90: 12-Bit, Differential, PENIRQ aktiv)
-    Tsc_WriteByte(0x90);
-    uint8_t yHi = Tsc_ReadByte();
-    uint8_t yLo = Tsc_ReadByte();
-    *y = (uint16_t)(((uint16_t)yHi << 5) | ((uint16_t)yLo >> 3)) & 0x0FFF;
-
-    Gpio_Set(GPIO_ID_TOUCH_CS, true);  // nCS High -> Chip deaktivieren
-
-    return true;
+    *xLcd = (uint16_t)x;
+    *yLcd = (uint16_t)y;
 }
