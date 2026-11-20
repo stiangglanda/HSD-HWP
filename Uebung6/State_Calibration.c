@@ -31,9 +31,9 @@ static const uint16_t cornerPos[4][2] = {
 };
 
 static CalPoint_t rawCorners[4];
-static CalData_t  calData;
-static uint8_t    currentCorner = 0;
-static bool       waitForRelease = false;
+static CalData_t calData;
+static uint8_t currentCorner = 0;
+static bool waitForRelease = false;
 
 static void DrawCorner(uint8_t index, RGB565_t color) {
     Lcd_FillRectangle(cornerPos[index][0], cornerPos[index][1],
