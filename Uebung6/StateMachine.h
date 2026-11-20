@@ -14,5 +14,6 @@ void StateMachine_Run(State_t const * state);
 
 extern State_t const State_A;
 extern State_t const State_B;
+extern State_t const State_Calibration;
 
 #endif

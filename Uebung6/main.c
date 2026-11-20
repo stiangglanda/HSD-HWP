@@ -1,12 +1,17 @@
 #include "Lcd.h"
+#include "Tsc.h"
 #include <stm32f072xb.h>
+#include <stdio.h>
 
 void Systemconfig_Clock(void);
+
+
 
 int main() {
     Systemconfig_Clock();
 
     Lcd_Initialize();
+    Tsc_Initialize();
 
     RGB565_t red   = { .R = 31, .G = 0,  .B = 0  };
     RGB565_t green = { .R = 0,  .G = 63, .B = 0  };
@@ -26,7 +31,27 @@ int main() {
 
     Lcd_Draw(x, y, Image.Width, Image.Height, Image.Data);
 
+    char buffer[40];
+    uint16_t touchX = 0;
+    uint16_t touchY = 0;
+
     while (true) {
+        if (Tsc_TestRead(&touchX, &touchY)) {
+            // Grünes Kästchen = Touch erkannt
+            Lcd_FillRectangle(10, 40, 30, 30, green);
+            snprintf(buffer, sizeof(buffer), "Touch: JA   X:%4u Y:%4u", touchX, touchY);
+        } else {
+            // Rotes Kästchen = kein Touch
+            Lcd_FillRectangle(10, 40, 30, 30, red);
+            snprintf(buffer, sizeof(buffer), "Touch: NEIN X:---- Y:----");
+        }
+
+        Lcd_Print(10, 85, buffer, white, black, &Consolas);
+
+        // Kurze Pause gegen Flackern auf dem Display
+        for (volatile uint32_t i = 0; i < 100000; i++) {
+            __asm volatile ("nop");
+        }
     }
 }
 

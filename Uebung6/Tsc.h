@@ -32,4 +32,6 @@ and the function returns immediately.
 ******************************************************************************/ 
 int Tsc_Read(bool *touched, uint16_t * x, uint16_t * y, uint8_t samples);
 
+bool Tsc_TestRead(uint16_t *x, uint16_t *y);
+
 #endif

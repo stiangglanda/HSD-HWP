@@ -22,7 +22,6 @@ static inline void Tsc_Delay(void) {
 	__asm volatile ("nop");
 }
 
-
 void Tsc_Initialize(void) {
 	//We get Busy, PenIRQ and DOUT
 	Gpio_Initialize(GPIO_ID_TOUCH_BUSY, GPIO_MODE_INPUT, false);
@@ -66,11 +65,10 @@ static uint8_t Tsc_ReadByte(void){
 		Gpio_Set(GPIO_ID_TOUCH_DCLK, true);
 		Tsc_Delay();
 
-		//Test for while busy
 		bool bitValue = false;
 		Gpio_Get(GPIO_ID_TOUCH_DOUT, &bitValue);
 
-		data = ((data << 1) | (uint8_t)(bitvalue));
+		data = ((data << 1) | (uint8_t)(bitValue));
 
 		Gpio_Set(GPIO_ID_TOUCH_DCLK, false);
 
@@ -102,7 +100,6 @@ static int Tsc_ReadRaw(bool* touched, uint16_t* x, uint16_t* y) {
 	uint8_t high_byte = Tsc_ReadByte();
 	uint8_t low_byte = Tsc_ReadByte();
 
-	// ToDo: x* = high | low correctly shifted and masked
 	high_byte = (0b01111111 ) & high_byte;
 	low_byte = low_byte >> 3;
 	*x = high_byte << 5 | low_byte;
@@ -111,10 +108,9 @@ static int Tsc_ReadRaw(bool* touched, uint16_t* x, uint16_t* y) {
 	// Y-Wert als 12Bit Wert
 	Tsc_WriteByte(0x90);
 
-	uint8_t high_byte = Tsc_ReadByte();
-	uint8_t low_byte = Tsc_ReadByte();
+	high_byte = Tsc_ReadByte();
+	low_byte = Tsc_ReadByte();
 
-	// ToDo: y* = high | low correctly shifted and masked
 	high_byte = (0b01111111 ) & high_byte;
 	low_byte = low_byte >> 3;
 	*y = high_byte << 5 | low_byte;
@@ -148,7 +144,7 @@ int Tsc_Read(bool *touched, uint16_t * x, uint16_t * y, uint8_t samples){
 
 	// call Tsc_ReadRaw() samples times
 	for(uint8_t sample = 0; sample < samples; sample++) {
-		int result = Tsc_ReadRaw(touched, x, y);
+		Tsc_ReadRaw(touched, x, y);
 
 		// hanlde a interrupted touch
 		if(!*touched) {
@@ -166,4 +162,32 @@ int Tsc_Read(bool *touched, uint16_t * x, uint16_t * y, uint8_t samples){
 	*y = Buffer_Y / samples;
 
 	return 0;
+}
+
+bool Tsc_TestRead(uint16_t *x, uint16_t *y) {
+    bool penIrq = true;
+    Gpio_Get(GPIO_ID_TOUCH_PENIRQ, &penIrq);
+
+    // PENIRQ ist active-low: false bedeutet, Display wird berührt
+    if (penIrq) {
+        return false;
+    }
+
+    Gpio_Set(GPIO_ID_TOUCH_CS, false); // nCS Low -> Chip aktivieren
+
+    // X-Wert lesen (Kommando 0xD0: 12-Bit, Differential, PENIRQ aktiv)
+    Tsc_WriteByte(0xD0);
+    uint8_t xHi = Tsc_ReadByte();
+    uint8_t xLo = Tsc_ReadByte();
+    *x = (uint16_t)(((uint16_t)xHi << 5) | ((uint16_t)xLo >> 3)) & 0x0FFF;
+
+    // Y-Wert lesen (Kommando 0x90: 12-Bit, Differential, PENIRQ aktiv)
+    Tsc_WriteByte(0x90);
+    uint8_t yHi = Tsc_ReadByte();
+    uint8_t yLo = Tsc_ReadByte();
+    *y = (uint16_t)(((uint16_t)yHi << 5) | ((uint16_t)yLo >> 3)) & 0x0FFF;
+
+    Gpio_Set(GPIO_ID_TOUCH_CS, true);  // nCS High -> Chip deaktivieren
+
+    return true;
 }
