@@ -1,6 +1,10 @@
 #include "Tsc.h"
 #include "Gpio.h"
 
+#define TSC_SAMPLES_NULL -1
+#define TSC_TOUCH_STOPPED -2
+
+
 static void Tsc_WriteByte(uint8_t data);
 static uint8_t Tsc_ReadByte(void);
 
@@ -99,6 +103,10 @@ static int Tsc_ReadRaw(bool* touched, uint16_t* x, uint16_t* y) {
 	uint8_t low_byte = Tsc_ReadByte();
 
 	// ToDo: x* = high | low correctly shifted and masked
+	high_byte = (0b01111111 ) & high_byte;
+	low_byte = low_byte >> 3;
+	*x = high_byte << 5 | low_byte;
+
 
 	// Y-Wert als 12Bit Wert
 	Tsc_WriteByte(0x90);
@@ -107,6 +115,9 @@ static int Tsc_ReadRaw(bool* touched, uint16_t* x, uint16_t* y) {
 	uint8_t low_byte = Tsc_ReadByte();
 
 	// ToDo: y* = high | low correctly shifted and masked
+	high_byte = (0b01111111 ) & high_byte;
+	low_byte = low_byte >> 3;
+	*y = high_byte << 5 | low_byte;
 
 	Gpio_Set(GPIO_ID_TOUCH_CS, true);
 	Tsc_Delay();
@@ -115,10 +126,44 @@ static int Tsc_ReadRaw(bool* touched, uint16_t* x, uint16_t* y) {
 	*touched = !penirq_high;
 
 	if (!*touched) {
+		*x = 0xFFFF;
+		*y = 0xFFFF;
 		return -2;
 	}
 
 	return 0; //Success
 }
 
-int Tsc_Read(bool *touched, uint16_t * x, uint16_t * y, uint8_t samples);
+int Tsc_Read(bool *touched, uint16_t * x, uint16_t * y, uint8_t samples){
+	//Buffer für x und y
+	uint32_t Buffer_X = 0;
+	uint32_t Buffer_Y = 0;
+
+	if(samples == 0) {
+		*touched = false;
+		*x = 0xFFFF;
+		*y = 0xFFFF;
+		return TSC_SAMPLES_NULL; //Error: No samples
+	}
+
+	// call Tsc_ReadRaw() samples times
+	for(uint8_t sample = 0; sample < samples; sample++) {
+		int result = Tsc_ReadRaw(touched, x, y);
+
+		// hanlde a interrupted touch
+		if(!*touched) {
+			*x = 0xFFFF;
+			*y = 0xFFFF;
+			return TSC_TOUCH_STOPPED;
+		}
+
+		Buffer_X += *x;
+		Buffer_Y += *y;
+	}
+
+	// calculate statistic mean
+	*x = Buffer_X / samples;
+	*y = Buffer_Y / samples;
+
+	return 0;
+}
