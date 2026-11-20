@@ -23,7 +23,6 @@ static const RGB565_t COLOR_BLACK = { .R = 0,  .G = 0,  .B = 0  };
 static const RGB565_t COLOR_BLUE  = { .R = 0,  .G = 0,  .B = 31 };
 static const RGB565_t COLOR_WHITE = { .R = 31, .G = 63, .B = 31 };
 
-// Reihenfolge: 0 = Oben-Links, 1 = Oben-Rechts, 2 = Unten-Links, 3 = Unten-Rechts
 static const uint16_t cornerPos[4][2] = {
     { 0,                          0                           },
     { LCD_WIDTH - CAL_OBJ_SIZE,   0                           },
@@ -42,13 +41,10 @@ static void DrawCorner(uint8_t index, RGB565_t color) {
 }
 
 static void CalculateCalibration(void) {
-    // 7. X offset: Mittelwert der linken Punkte (Oben-Links & Unten-Links)
     calData.x_offset = ((float)rawCorners[0].x + (float)rawCorners[2].x) / 2.0f;
 
-    // 8. Y offset: Mittelwert der oberen Punkte (Oben-Links & Oben-Rechts)
     calData.y_offset = ((float)rawCorners[0].y + (float)rawCorners[1].y) / 2.0f;
 
-    // 9. X scale: Displaybreite (abzüglich Objektbreite) / mittlere X-Distanz
     float distTopX    = (float)rawCorners[1].x - (float)rawCorners[0].x;
     float distBottomX = (float)rawCorners[3].x - (float)rawCorners[2].x;
     float avgDistX    = (distTopX + distBottomX) / 2.0f;
@@ -57,7 +53,6 @@ static void CalculateCalibration(void) {
         calData.x_scale = (float)(LCD_WIDTH - CAL_OBJ_SIZE) / avgDistX;
     }
 
-    // 10. Y scale: Displayhöhe (abzüglich Objekthöhe) / mittlere Y-Distanz
     float distLeftY  = (float)rawCorners[2].y - (float)rawCorners[0].y;
     float distRightY = (float)rawCorners[3].y - (float)rawCorners[1].y;
     float avgDistY   = (distLeftY + distRightY) / 2.0f;
@@ -71,7 +66,6 @@ static void Enter(void) {
     currentCorner = 0;
     waitForRelease = false;
 
-    // 1. Display löschen (schwarz) und 2. erste Ecke (oben links) blau markieren
     Lcd_FillRectangle(0, 0, LCD_WIDTH, LCD_HEIGHT, COLOR_BLACK);
     DrawCorner(currentCorner, COLOR_BLUE);
 }
@@ -83,23 +77,23 @@ static State_t const * Process(void) {
 
     Tsc_Read(&touched, &x, &y, CAL_SAMPLES);
 
-    // Warten, bis der Finger nach der letzten Messung losgelassen wurde
+    // Wait for release
     if (waitForRelease) {
         if (!touched) {
             waitForRelease = false;
 
             if (currentCorner >= 4) {
                 CalculateCalibration();
-                return &State_A; // Kalibrierung fertig -> nächster State
+                return &State_A; // Calibration done
             }
 
-            // Nächste Ecke blau markieren
+            // Mark next corner
             DrawCorner(currentCorner, COLOR_BLUE);
         }
         return &State_Calibration;
     }
 
-    // 3. & 4. Touch erkannt -> Koordinaten speichern & 5. Ecke weiß markieren
+    // Store touch and mark corner
     if (touched) {
         rawCorners[currentCorner].x = x;
         rawCorners[currentCorner].y = y;
