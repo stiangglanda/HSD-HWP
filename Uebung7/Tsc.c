@@ -1,0 +1,200 @@
+#include "Tsc.h"
+#include "Lcd.h"
+#include "Gpio.h"
+
+#define TSC_SAMPLES_NULL -1
+#define TSC_TOUCH_STOPPED -2
+
+
+static void Tsc_WriteByte(uint8_t data);
+static uint8_t Tsc_ReadByte(void);
+
+static inline void Tsc_Delay(void) {
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+}
+
+void Tsc_Initialize(void) {
+	//We get Busy, PenIRQ and DOUT
+	Gpio_Initialize(GPIO_ID_TOUCH_BUSY, GPIO_MODE_INPUT, false);
+	Gpio_Initialize(GPIO_ID_TOUCH_PENIRQ, GPIO_MODE_INPUT, false);
+	Gpio_Initialize(GPIO_ID_TOUCH_DOUT, GPIO_MODE_INPUT, false);
+	
+	//We define DIN, nCS and CLK	
+	Gpio_Initialize(GPIO_ID_TOUCH_DIN, GPIO_MODE_OUTPUT, false);
+	Gpio_Initialize(GPIO_ID_TOUCH_CS, GPIO_MODE_OUTPUT, false);
+	Gpio_Initialize(GPIO_ID_TOUCH_DCLK, GPIO_MODE_OUTPUT, false);
+}
+
+static void Tsc_WriteByte(uint8_t data){
+//Durchlaufen aller Bits und setzten der Leitung
+	for (int8_t bit = 7; bit >= 0; bit--) {
+		//Setzen der DCLK-Line
+		Gpio_Set(GPIO_ID_TOUCH_DCLK, false);
+		
+		if (data & (uint8_t)(0x1 << bit)) {
+			Gpio_Set(GPIO_ID_TOUCH_DIN, true);
+		} else {
+			Gpio_Set(GPIO_ID_TOUCH_DIN, false);
+		}
+		Tsc_Delay();
+		
+		// Setzten der DCLK-Line
+		Gpio_Set(GPIO_ID_TOUCH_DCLK, true);
+		Tsc_Delay();
+	}
+	
+	Gpio_Set(GPIO_ID_TOUCH_DCLK, false);
+	Gpio_Set(GPIO_ID_TOUCH_DIN, false);
+}
+
+static uint8_t Tsc_ReadByte(void){
+	uint8_t data = 0x0;
+	
+	Gpio_Set(GPIO_ID_TOUCH_DCLK, false);
+	
+	for(uint8_t bit = 0; bit <= 7; bit++) {
+		Gpio_Set(GPIO_ID_TOUCH_DCLK, true);
+		Tsc_Delay();
+
+		bool bitValue = false;
+		Gpio_Get(GPIO_ID_TOUCH_DOUT, &bitValue);
+
+		data = ((data << 1) | (uint8_t)(bitValue));
+
+		Gpio_Set(GPIO_ID_TOUCH_DCLK, false);
+
+		Tsc_Delay();
+	}
+	return data;
+}
+
+static int Tsc_ReadRaw(bool* touched, uint16_t* x, uint16_t* y) {
+	bool penirq_high = true;
+	Gpio_Get(GPIO_ID_TOUCH_PENIRQ, &penirq_high);
+
+	*touched = !penirq_high;
+	if (!*touched) {
+		*x = 0xFFFF;
+		*y = 0xFFFF;
+
+		return -1; //Not touched
+	}
+
+	// We set CS to low to enable writing and reading
+	Gpio_Set(GPIO_ID_TOUCH_CS, false);
+
+	Tsc_Delay();
+
+	// X-Wert als 12Bit Wert
+	Tsc_WriteByte(0xD0);
+
+	uint8_t high_byte = Tsc_ReadByte();
+	uint8_t low_byte = Tsc_ReadByte();
+
+	high_byte = (0b01111111 ) & high_byte;
+	low_byte = low_byte >> 3;
+	*x = high_byte << 5 | low_byte;
+
+
+	// Y-Wert als 12Bit Wert
+	Tsc_WriteByte(0x90);
+
+	high_byte = Tsc_ReadByte();
+	low_byte = Tsc_ReadByte();
+
+	high_byte = (0b01111111 ) & high_byte;
+	low_byte = low_byte >> 3;
+	*y = high_byte << 5 | low_byte;
+
+	Gpio_Set(GPIO_ID_TOUCH_CS, true);
+	Tsc_Delay();
+
+	Gpio_Get(GPIO_ID_TOUCH_PENIRQ, &penirq_high);
+	*touched = !penirq_high;
+
+	if (!*touched) {
+		*x = 0xFFFF;
+		*y = 0xFFFF;
+		return -2;
+	}
+
+	return 0; //Success
+}
+
+int Tsc_Read(bool *touched, uint16_t * x, uint16_t * y, uint8_t samples){
+	//Buffer für x und y
+	uint32_t Buffer_X = 0;
+	uint32_t Buffer_Y = 0;
+
+	if(samples == 0) {
+		*touched = false;
+		*x = 0xFFFF;
+		*y = 0xFFFF;
+		return TSC_SAMPLES_NULL; //Error: No samples
+	}
+
+	// call Tsc_ReadRaw() samples times
+	for(uint8_t sample = 0; sample < samples; sample++) {
+		Tsc_ReadRaw(touched, x, y);
+
+		// hanlde a interrupted touch
+		if(!*touched) {
+			*x = 0xFFFF;
+			*y = 0xFFFF;
+			return TSC_TOUCH_STOPPED;
+		}
+
+		Buffer_X += *x;
+		Buffer_Y += *y;
+	}
+
+	// calculate statistic mean
+	*x = Buffer_X / samples;
+	*y = Buffer_Y / samples;
+
+	return 0;
+}
+
+static Tsc_Calibration_t tscCal = {
+    .x_offset = 0.0f,
+    .y_offset = 0.0f,
+    .x_scale  = 1.0f,
+    .y_scale  = 1.0f
+};
+
+void Tsc_SetCalibration(Tsc_Calibration_t const * cal) {
+    if (cal != 0) {
+        tscCal = *cal;
+    }
+}
+
+void Tsc_ConvertToLcd(uint16_t xTsc, uint16_t yTsc, uint16_t * xLcd, uint16_t * yLcd) {
+    float x = tscCal.x_scale * ((float)xTsc - tscCal.x_offset);
+    float y = tscCal.y_scale * ((float)yTsc - tscCal.y_offset);
+
+    // Begrenzung auf gültige Display-Grenzen (verhindert Unterlauf/Überlauf bei uint16_t)
+    if (x < 0.0f) {
+        x = 0.0f;
+    } else if (x >= (float)LCD_WIDTH) {
+        x = (float)(LCD_WIDTH - 1U);
+    }
+
+    if (y < 0.0f) {
+        y = 0.0f;
+    } else if (y >= (float)LCD_HEIGHT) {
+        y = (float)(LCD_HEIGHT - 1U);
+    }
+
+    *xLcd = (uint16_t)x;
+    *yLcd = (uint16_t)y;
+}
